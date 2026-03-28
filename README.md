@@ -1,12 +1,12 @@
-# Hola, soy @artse12 👋
+# @artse12
 
-> Construyo con **Claude Code** — de la idea al producto terminado.
+> Builder con **Claude Code** — de la idea al producto en producción.
 
 ---
 
-## ⚡ Cómo trabajo
+## ⚡ Flujo de trabajo
 
-Uso [Claude Code](https://claude.ai/code) como herramienta principal de desarrollo. No soy programador tradicional: soy alguien que sabe qué quiere construir y usa IA para hacerlo realidad — rápido, limpio y funcional.
+Uso [Claude Code](https://claude.ai/code) como herramienta principal. No soy programador tradicional: tengo clara la visión y uso IA para ejecutarla — rápido, limpio, funcional.
 
 ```
 Idea  →  Claude Code  →  Producto real
@@ -14,19 +14,28 @@ Idea  →  Claude Code  →  Producto real
 
 ---
 
-## 🗂️ Proyectos
+## 🖥️ Setup en cualquier dispositivo
 
-### 🔩 Metalicas Jobie
-> Web corporativa completa para empresa de estructuras metálicas
+Toda mi configuración de Claude Code está centralizada:
 
-- **Stack:** HTML · CSS · JavaScript
-- **Qué tiene:** catálogo de servicios, galería de obras, formulario de contacto, diseño responsive
-- **Repos:** `metalicas-jobie` + `proyecto-metalicas-jobie`
-- **Estado:** ✅ Completado
+```bash
+git clone https://github.com/artse12/claude-setup
+cd claude-setup && bash setup.sh
+```
+
+→ **[artse12/claude-setup](https://github.com/artse12/claude-setup)** — skills, hooks y settings listos al instante
 
 ---
 
-## 🛠️ Stack habitual
+## 🗂️ Proyectos
+
+| Proyecto | Stack | Estado |
+|---|---|---|
+| *Próximamente...* | | |
+
+---
+
+## 🛠️ Stack
 
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
@@ -35,10 +44,10 @@ Idea  →  Claude Code  →  Producto real
 
 ---
 
-## 📬 Contacto
+## 📫 Contacto
 
-- ✉️ haithamelashhab@gmail.com
+✉️ haithamelashhab@gmail.com
 
 ---
 
-<sub>Perfil actualizado con Claude Code · 2026</sub>
+<sub>Perfil mantenido con Claude Code · 2026</sub>
