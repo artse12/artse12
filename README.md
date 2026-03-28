@@ -46,7 +46,7 @@ cd claude-setup && bash setup.sh
 
 ## 📫 Contacto
 
-✉️ haithamelashhab@gmail.com
+✉️ artse12@gmail.com
 
 ---
 
