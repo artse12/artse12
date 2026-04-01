@@ -1,0 +1,13 @@
+{
+  "exchanges": {
+    "binance": ["Binance"],
+    "coinbase": ["Coinbase"],
+    "kraken": ["Kraken"],
+    "okx": ["OKX"],
+    "bingx": ["BingX"],
+    "bybit": ["Bybit"],
+    "bitfinex": ["Bitfinex"],
+    "huobi": ["Huobi", "HTX"]
+  },
+  "notes": "Etiquetas para clasificar transacciones whale. Exchange→exchange = movimiento interno, ignorar. wallet→exchange = presión vendedora. exchange→wallet = acumulación/retiro."
+}

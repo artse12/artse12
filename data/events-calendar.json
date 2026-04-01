@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2026-04-30",
+    "time": "18:00",
+    "timezone": "UTC",
+    "event": "FOMC Decision",
+    "impact": "high",
+    "notes": "Federal Reserve interest rate decision. Alta volatilidad esperada ±2h."
+  },
+  {
+    "date": "2026-05-13",
+    "time": "12:30",
+    "timezone": "UTC",
+    "event": "US CPI Report",
+    "impact": "high",
+    "notes": "Consumer Price Index. Dato de inflación con alto impacto en cripto."
+  }
+]

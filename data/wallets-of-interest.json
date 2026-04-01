@@ -1,0 +1,37 @@
+[
+  {
+    "name": "MicroStrategy Treasury",
+    "address": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    "alert_on_move": true,
+    "type": "accumulator",
+    "notes": "Principal treasury de MicroStrategy. Movimientos de entrada = acumulación institucional fuerte."
+  },
+  {
+    "name": "BlackRock IBIT ETF",
+    "address": "bc1qd4ysezhmypwty5dnw7c8nqy5h5f7dlmtfg2cq",
+    "alert_on_move": true,
+    "type": "institutional",
+    "notes": "Custodio del ETF Bitcoin de BlackRock. Entradas grandes = demanda institucional."
+  },
+  {
+    "name": "Fidelity FBTC ETF",
+    "address": "bc1qjasf9z3h7w3jspkhtgatgpyvvzgpa2wwd2lr38",
+    "alert_on_move": true,
+    "type": "institutional",
+    "notes": "Custodio del ETF Bitcoin de Fidelity. Entradas grandes = demanda institucional."
+  },
+  {
+    "name": "Mt. Gox Distribution",
+    "address": "1Bczm9B5z6gijHsKRWFGqFRpJBRzAaGNPm",
+    "alert_on_move": true,
+    "type": "distribution_risk",
+    "notes": "Wallet de distribución de Mt.Gox. Cualquier movimiento puede indicar ventas masivas inminentes."
+  },
+  {
+    "name": "US Government Seized BTC",
+    "address": "bc1qa5wkgaew2dkv56kfvj49j0av5nml45x9ek9hz6",
+    "alert_on_move": true,
+    "type": "distribution_risk",
+    "notes": "BTC confiscado por el gobierno de EEUU. Movimientos = posible subasta masiva (presión vendedora)."
+  }
+]

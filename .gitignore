@@ -1,0 +1,28 @@
+# Secrets — NUNCA subir al repo
+.env
+
+# Estado persistente del bot (contiene balances y profit real)
+profit-state.json
+strategy-state.json
+
+# Logs (pueden contener datos financieros sensibles)
+logs/
+
+# Caché de APIs externas
+cache/
+
+# Build output
+dist/
+
+# Dependencias
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
