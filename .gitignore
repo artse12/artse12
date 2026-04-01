@@ -13,9 +13,22 @@ cache/
 
 # Build output
 dist/
+saas/dist/
 
 # Dependencias
 node_modules/
+saas/node_modules/
+
+# SaaS bases de datos (contienen datos de usuarios encriptados)
+saas.db
+saas.db-wal
+saas.db-shm
+sessions.db
+sessions.db-wal
+sessions.db-shm
+
+# Datos de usuarios (creados en runtime por bot-manager)
+data/users/
 
 # OS
 .DS_Store

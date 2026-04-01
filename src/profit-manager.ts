@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import 'dotenv/config';
 import type { BingXClient } from './bingx.js';
 import { RiskManager } from './risk.js';
+import { sendAlert, formatDistribution } from './telegram.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -200,6 +201,17 @@ export class ProfitManager {
       parseFloat(this.state.totalReinvested) + reinject
     ).toFixed(2);
     this._save();
+
+    // Telegram notification
+    await sendAlert(formatDistribution({
+      total,
+      reinject,
+      spotBtc: spotBtcUsdt,
+      earn: earnDeposited,
+      btcBought,
+      totalBtcAccumulated: this.state.totalBtcAccumulated,
+      totalUsdtInEarn: this.state.totalUsdtInEarn,
+    })).catch(() => {});
 
     // Reset dip buy counter after distribution (new cycle)
     this.resetDipBuys();

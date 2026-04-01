@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { logger } from './logger.js';
+import { sendAlert, formatDailySummary } from './telegram.js';
 import { BingXClient } from './bingx.js';
 import { MarketContext } from './market-context.js';
 import { Oracle } from './oracle.js';
@@ -196,6 +197,23 @@ async function runCycle(): Promise<void> {
   if (botState.totalCycles % STRATEGY_EVAL_INTERVAL === 0) {
     logger.info(`[Strategy] Evaluando y adaptando estrategia (ciclo ${botState.totalCycles})...`);
     await strategyManager.evaluateAndAdapt();
+  }
+
+  // 8. Daily Telegram summary (every 288 cycles ≈ 24h at 5min intervals)
+  const dailyInterval = Math.round(24 * 60 / INTERVAL_MINUTES);
+  if (botState.totalCycles % dailyInterval === 0 && botState.totalCycles > 0) {
+    const ps = profitManager.getState();
+    const strat = strategyManager.getCurrent();
+    await sendAlert(formatDailySummary({
+      cycleNum: botState.totalCycles,
+      accumulatedProfit: ps.accumulatedProfit,
+      totalBtcAccumulated: ps.totalBtcAccumulated,
+      totalUsdtInEarn: ps.totalUsdtInEarn,
+      totalDistributions: ps.totalDistributions,
+      strategyName: strat.name,
+      lastAction: finalFuturesDec.action,
+      btcPrice: futuresPrice,
+    })).catch(() => {});
   }
 }
 

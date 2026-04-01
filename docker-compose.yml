@@ -1,0 +1,49 @@
+services:
+  # ── SaaS Platform (gestiona bots de todos los usuarios) ──────
+  saas:
+    build:
+      context: .
+      dockerfile: saas/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"   # Solo accesible desde localhost (Nginx hace el proxy)
+    volumes:
+      - ./data/users:/data/users          # Datos aislados por usuario
+      - ./dist:/app/bot/dist:ro           # Bot compilado (read-only)
+      - ./data:/app/bot/data:ro           # Datos estáticos del bot (wallets, events)
+      - saas_db:/app/data                 # Base de datos SQLite
+    environment:
+      - NODE_ENV=production
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - BOT_DIST_PATH=/app/bot/dist
+      - BOT_DATA_PATH=/app/bot/data
+      - USERS_DATA_PATH=/data/users
+      - PORT=3000
+    depends_on: []
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Nginx reverse proxy ───────────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - nginx_cache:/var/cache/nginx
+    depends_on:
+      saas:
+        condition: service_healthy
+
+volumes:
+  saas_db:
+    driver: local
+  nginx_cache:
+    driver: local

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { sendAlert, formatError } from './telegram.js';
 import type { OracleDecision } from './oracle.js';
 import type { FearAndGreed, GeminiNews, WhaleActivity, SessionContext } from './market-context.js';
 import type { ProfitState } from './profit-manager.js';
@@ -165,6 +166,7 @@ ${C.dim}────────────────────────
   error(err: Error): void {
     console.error(`${C.red}[${ts()}] ✗ ERROR: ${err.message}${C.reset}`);
     if (err.stack) console.error(`${C.gray}${err.stack}${C.reset}`);
+    sendAlert(formatError(err.message)).catch(() => {});
     ensureLogs();
     fs.appendFileSync(
       path.join(LOGS_DIR, 'errors.log'),
