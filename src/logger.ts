@@ -9,7 +9,7 @@ import type { StrategyState } from './strategy-manager.js';
 import type { Position } from './bingx.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = process.env.BOT_ROOT_DIR ?? path.resolve(__dirname, '..');
 const LOGS_DIR = path.join(ROOT, 'logs');
 
 // ── ANSI colors ───────────────────────────────────────────────

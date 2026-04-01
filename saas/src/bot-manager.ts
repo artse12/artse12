@@ -111,9 +111,8 @@ function buildBotEnv(userId: string, settings: UserSettings): NodeJS.ProcessEnv 
     FUTURES_RISK_PCT: String(settings.futures_risk_pct),
     PROFIT_THRESHOLD_USDT: String(settings.profit_threshold),
     // Paths — override to user-specific directory
-    BOT_USER_DIR: base,
-    // Override resolved paths inside the bot by setting HOME-like env vars
-    // The bot reads these in its own path resolution
+    BOT_ROOT_DIR: base,
+    // Override resolved paths inside the bot — all bot files use this env var
   };
 }
 

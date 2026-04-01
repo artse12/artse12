@@ -7,7 +7,8 @@ import { RiskManager } from './risk.js';
 import { sendAlert, formatDistribution } from './telegram.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+// BOT_ROOT_DIR permite al SaaS aislar el estado por usuario
+const ROOT = process.env.BOT_ROOT_DIR ?? path.resolve(__dirname, '..');
 const STATE_PATH = path.join(ROOT, 'profit-state.json');
 const LOG_PATH = path.join(ROOT, 'logs', 'distributions.jsonl');
 const DRY_RUN = process.env.DRY_RUN !== 'false';

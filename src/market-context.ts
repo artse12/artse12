@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import 'dotenv/config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = process.env.BOT_ROOT_DIR ?? path.resolve(__dirname, '..');
 const CACHE_DIR = path.join(ROOT, 'cache');
 const DATA_DIR = path.join(ROOT, 'data');
 
