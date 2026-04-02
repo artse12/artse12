@@ -1,71 +1,79 @@
-# @artse12
+# 🤖 BTC Dual Bot — BingX v2
 
-> Builder con **Claude Code** — de la idea al producto en producción.
+Bot de trading algorítmico 24/7 para BingX con oracle de IA (Claude Sonnet).
+Opera en tres modos simultáneos con gestión de riesgo estricta.
 
----
+## Modos de operación
 
-## ⚡ Flujo de trabajo
+| Modo | Descripción | Límites |
+|------|-------------|---------|
+| **Futures** | Captura tendencias long/short | Máx 3x leverage, 2% riesgo/trade |
+| **Spot** | Acumula BTC real comprando dips | Nunca vende, DCA inteligente |
+| **Earn** | Aparca % del profit en BingX Flexible Earn | Solo si APY ≥ 2% |
 
-Uso [Claude Code](https://claude.ai/code) como herramienta principal. No soy programador tradicional: tengo clara la visión y uso IA para ejecutarla — rápido, limpio, funcional.
+## Distribución automática de profit
+Cuando el profit acumulado alcanza el umbral configurado:
+- **30%** se reinvierte en Futures
+- **40%** compra BTC Spot
+- **30%** va a BingX Flexible Earn
+
+## Oracle de IA
+- **Principal**: Claude Sonnet — decisiones con indicadores técnicos, sentimiento y datos on-chain
+- **Segunda opinión**: Gemini 2.0 Flash — noticias macro, validación si confianza ≥ 80%
+- **Auto-adaptación**: ajusta parámetros de estrategia cada 50 ciclos
+
+## Fuentes de datos en tiempo real
+- Fear & Greed Index
+- Noticias macro (Gemini + Google Search)
+- Actividad ballenas (Whale Alert)
+- Wallets institucionales BTC (Mempool.space)
+- Contexto de sesión (Wall Street, Asia, Londres)
+
+## Indicadores técnicos
+RSI · EMA 20/50/200 · MACD · ATR · Volumen relativo · Régimen de tendencia 1h/4h/D
+
+## SaaS Multi-usuario
+- Dashboard web con estado del bot en tiempo real
+- Instancias aisladas por usuario con API keys propias
+- Key Anthropic compartida del servidor o propia por usuario
+- Login con email/contraseña o Google OAuth
+- Alertas Telegram: distribución de profit, errores, resumen diario
+
+## Stack
 
 ```
-Idea  →  Claude Code  →  Producto real
+Node.js 20 · TypeScript · Express.js · SQLite · Docker · Nginx · Lets Encrypt
 ```
 
----
+## Requisitos
+- BingX API key (permisos: Read + Trade, sin Withdrawal)
+- Anthropic API key (Claude Sonnet)
+- Gemini API key (gratuito en aistudio.google.com)
+- VPS Ubuntu 22.04 (mínimo 2 vCPU / 4 GB RAM)
 
-## 🖥️ Setup en cualquier dispositivo
-
-Toda mi configuración de Claude Code está centralizada:
+## Deploy en VPS
 
 ```bash
-git clone https://github.com/artse12/claude-setup
-cd claude-setup && bash setup.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/artse12/btc-dual-bot-bingx/main/deploy.sh)
 ```
 
-→ **[artse12/claude-setup](https://github.com/artse12/claude-setup)** — skills, hooks y settings listos al instante
+Instala automáticamente: Docker, Nginx, SSL (Lets Encrypt), firewall UFW.
 
----
+## Variables de entorno principales
 
-## 🗂️ Proyectos
+```env
+ADMIN_EMAIL=tu@email.com
+ANTHROPIC_API_KEY=sk-ant-...
+BINGX_API_KEY=...
+BINGX_API_SECRET=...
+ENCRYPTION_KEY=...
+SESSION_SECRET=...
+```
 
-| Proyecto | Stack | Estado |
-|---|---|---|
-| *Próximamente...* | | |
+Ver `.env.example` para configuración completa.
 
----
-
-## 🛠️ Stack
-
-**JavaScript**
-
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
-
-**Python & IA**
-
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
-![Claude Code](https://img.shields.io/badge/Claude_Code-CC785C?style=flat&logo=anthropic&logoColor=white)
-![OpenAI API](https://img.shields.io/badge/OpenAI_API-412991?style=flat&logo=openai&logoColor=white)
-
-**Infraestructura**
-
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
-![Bash](https://img.shields.io/badge/Bash-4EAA25?style=flat&logo=gnubash&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white)
-
----
-
-## 📫 Contacto
-
-✉️ artse12@gmail.com
-
----
-
-<sub>Perfil mantenido con Claude Code · 2026</sub>
+## Reglas inamovibles
+- Leverage máximo: **3x**
+- Riesgo máximo por trade: **2%** del balance
+- El BTC acumulado en Spot **nunca se vende**
+- DRY_RUN=true por defecto — activar live trading explícitamente
