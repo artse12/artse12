@@ -47,9 +47,13 @@ ufw --force enable
 
 # ── 6. Clonar repo ──────────────────────────────────────────────
 echo -e "${YELLOW}[6/8] Configurando proyecto...${NC}"
+read -p "  GitHub PAT (para clonar repo privado): " GITHUB_PAT
 INSTALL_DIR="/opt/btc-saas"
 if [ ! -d "$INSTALL_DIR" ]; then
-    git clone https://github.com/artse12/artse12 "$INSTALL_DIR" --branch main
+    git clone "https://artse12:${GITHUB_PAT}@github.com/artse12/btc-dual-bot-bingx.git" \
+      "$INSTALL_DIR" --branch main
+    cd "$INSTALL_DIR"
+    git remote set-url origin https://github.com/artse12/btc-dual-bot-bingx.git
 else
     echo "  Directorio ya existe. Actualizando..."
     cd "$INSTALL_DIR" && git pull origin main
@@ -106,16 +110,29 @@ docker compose up -d saas
 echo ""
 read -p "¿Configurar SSL con Let's Encrypt? (s/N): " SETUP_SSL
 if [[ "$SETUP_SSL" == "s" || "$SETUP_SSL" == "S" ]]; then
-    read -p "Introduce tu dominio (ej: bot.ejemplo.com): " DOMAIN
+    read -p "Introduce tu dominio (ej: trade.artemlabs.es): " DOMAIN
     if [ -n "$DOMAIN" ]; then
+        # Parar y deshabilitar nginx del host (Docker nginx toma los puertos)
+        systemctl stop nginx 2>/dev/null || true
+        systemctl disable nginx 2>/dev/null || true
+
+        # Obtener certificado con servidor standalone temporal
+        certbot certonly --standalone -d "$DOMAIN" \
+          --non-interactive --agree-tos -m "admin@$DOMAIN"
+
+        # Actualizar nginx config con el dominio
         sed -i "s/TU_DOMINIO/$DOMAIN/g" nginx/default.conf
-        certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "admin@$DOMAIN"
+
+        # Arrancar Docker nginx con los certs montados
         docker compose up -d nginx
+
         echo -e "\n${GREEN}✅ SSL configurado para $DOMAIN${NC}"
         echo -e "${GREEN}   Dashboard: https://$DOMAIN${NC}"
     fi
 else
-    echo -e "${YELLOW}  SSL omitido. Dashboard accesible en http://$(curl -s ifconfig.me):3000${NC}"
+    ufw allow 3000/tcp
+    VPS_IP=$(curl -s ifconfig.me)
+    echo -e "${YELLOW}  SSL omitido. Dashboard: http://${VPS_IP}:3000${NC}"
 fi
 
 # ── Resumen ─────────────────────────────────────────────────────
