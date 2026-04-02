@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express';
-import { getUserSettings, updateUserSettings, hasApiKeysConfigured } from '../db.js';
+import { getUserSettings, updateUserSettings, hasApiKeysConfigured, isAdmin } from '../db.js';
 import { getBotStatus, spawnBot, stopBot } from '../bot-manager.js';
 
 const router = Router();
@@ -9,13 +9,14 @@ router.get('/settings', (req: Request, res: Response) => {
   const userId = req.session!.userId!;
   const settings = getUserSettings(userId);
   const status = getBotStatus(userId);
+  const adminUser = isAdmin(userId);
   const welcome = req.query.welcome === '1';
   const saved = req.session?.flashSuccess;
   delete req.session.flashSuccess;
   const error = req.session?.flashError;
   delete req.session.flashError;
 
-  res.send(settingsHtml({ settings, status, welcome, saved, error }));
+  res.send(settingsHtml({ settings, status, adminUser, welcome, saved, error }));
 });
 
 // ── POST /settings ────────────────────────────────────────────
@@ -44,7 +45,7 @@ router.post('/settings', async (req: Request, res: Response) => {
     const status = getBotStatus(userId);
     if (status.running) {
       const newSettings = getUserSettings(userId);
-      if (newSettings?.anthropic_api_key) {
+      if (newSettings?.anthropic_api_key || process.env.ANTHROPIC_API_KEY) {
         stopBot(userId);
         setTimeout(() => {
           if (newSettings) spawnBot(userId, newSettings);
@@ -88,12 +89,22 @@ function mask(val: string): string {
 function settingsHtml(params: {
   settings: ReturnType<typeof getUserSettings>;
   status: ReturnType<typeof getBotStatus>;
+  adminUser: boolean;
   welcome: boolean;
   saved?: string;
   error?: string;
 }): string {
-  const { settings, status, welcome, saved, error } = params;
+  const { settings, status, adminUser, welcome, saved, error } = params;
   const s = settings;
+
+  let apiModeBadge: string;
+  if (adminUser || s?.anthropic_api_key) {
+    apiModeBadge = '<span class="badge running">🔑 Usando tu key (Sonnet)</span>';
+  } else if (process.env.ANTHROPIC_API_KEY) {
+    apiModeBadge = '<span class="badge" style="background:#1a2f4a;color:#58a6ff">🌐 Key del servidor (Sonnet, mín. 15 min)</span>';
+  } else {
+    apiModeBadge = '<span class="badge stopped">⚠️ Sin key — bot no puede iniciar</span>';
+  }
 
   return `<!DOCTYPE html>
 <html lang="es">
@@ -144,13 +155,13 @@ function settingsHtml(params: {
       </div>
 
       <div class="card">
-        <h3>🤖 API Keys de IA</h3>
+        <h3>🤖 API Keys de IA &nbsp;${apiModeBadge}</h3>
         <div class="field-group">
           <div class="field">
-            <label>Anthropic API Key <span class="required">*</span></label>
+            <label>Anthropic API Key <span style="color:#8b949e">(opcional)</span></label>
             <input type="password" name="anthropic_api_key"
-              placeholder="${s?.anthropic_api_key ? mask(s.anthropic_api_key) : 'sk-ant-...'}">
-            <small>Oracle principal (Claude). Obligatorio.</small>
+              placeholder="${s?.anthropic_api_key ? mask(s.anthropic_api_key) : 'sk-ant-... (opcional)'}">
+            <small>Opcional. Sin key propia se usa la del servidor (Sonnet, mín. 15 min/ciclo).</small>
           </div>
           <div class="field">
             <label>Gemini API Key</label>

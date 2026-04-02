@@ -14,6 +14,7 @@ export interface User {
   password_hash: string;
   created_at: number;
   is_active: number;
+  is_admin: number;
 }
 
 export interface UserSettings {
@@ -75,16 +76,22 @@ function migrate(db: Database.Database): void {
 
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   `);
+
+  // Idempotent migrations for new columns
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`);
+  } catch { /* column already exists */ }
 }
 
 // ── User queries ──────────────────────────────────────────────
 
 export function createUser(id: string, email: string, passwordHash: string): void {
   const db = getDb();
+  const isAdmin = email.toLowerCase() === (process.env.ADMIN_EMAIL ?? '').toLowerCase() && process.env.ADMIN_EMAIL ? 1 : 0;
   db.prepare(`
-    INSERT INTO users (id, email, password_hash, created_at, is_active)
-    VALUES (?, ?, ?, ?, 1)
-  `).run(id, email.toLowerCase(), passwordHash, Date.now());
+    INSERT INTO users (id, email, password_hash, created_at, is_active, is_admin)
+    VALUES (?, ?, ?, ?, 1, ?)
+  `).run(id, email.toLowerCase(), passwordHash, Date.now(), isAdmin);
 
   // Create default settings
   db.prepare(`
@@ -224,8 +231,17 @@ export function updateUserSettings(
 }
 
 export function hasApiKeysConfigured(userId: string): boolean {
+  // Server-level shared key counts as configured for any user
+  if (process.env.ANTHROPIC_API_KEY) return true;
   const row = getDb()
     .prepare('SELECT anthropic_api_key_enc FROM user_settings WHERE user_id = ?')
     .get(userId) as { anthropic_api_key_enc: string } | undefined;
   return !!(row?.anthropic_api_key_enc);
+}
+
+export function isAdmin(userId: string): boolean {
+  const row = getDb()
+    .prepare('SELECT is_admin FROM users WHERE id = ?')
+    .get(userId) as { is_admin: number } | undefined;
+  return row?.is_admin === 1;
 }

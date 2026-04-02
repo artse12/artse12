@@ -93,12 +93,24 @@ function ensureUserDirs(userId: string): void {
 
 // ── Build env for user bot ────────────────────────────────────
 
+const MIN_SHARED_INTERVAL = 15; // minimum cycle minutes when using server's shared key
+
 function buildBotEnv(userId: string, settings: UserSettings): NodeJS.ProcessEnv {
   const base = userDir(userId);
+  const userHasOwnKey = !!settings.anthropic_api_key;
+  const anthropicKey = userHasOwnKey
+    ? settings.anthropic_api_key
+    : (process.env.ANTHROPIC_API_KEY ?? '');
+  const claudeModel = process.env.CLAUDE_MODEL ?? 'claude-sonnet-4-6';
+  const intervalMins = userHasOwnKey
+    ? settings.interval_minutes
+    : Math.max(settings.interval_minutes, MIN_SHARED_INTERVAL);
+
   return {
     ...process.env,
     // API keys (decrypted — only exist in memory)
-    ANTHROPIC_API_KEY: settings.anthropic_api_key,
+    ANTHROPIC_API_KEY: anthropicKey,
+    CLAUDE_MODEL: claudeModel,
     BINGX_API_KEY: settings.bingx_api_key,
     BINGX_API_SECRET: settings.bingx_api_secret,
     GEMINI_API_KEY: settings.gemini_api_key,
@@ -107,12 +119,11 @@ function buildBotEnv(userId: string, settings: UserSettings): NodeJS.ProcessEnv 
     TELEGRAM_CHAT_ID: settings.telegram_chat_id,
     // Bot settings
     DRY_RUN: settings.dry_run ? 'true' : 'false',
-    INTERVAL_MINUTES: String(settings.interval_minutes),
+    INTERVAL_MINUTES: String(intervalMins),
     FUTURES_RISK_PCT: String(settings.futures_risk_pct),
     PROFIT_THRESHOLD_USDT: String(settings.profit_threshold),
     // Paths — override to user-specific directory
     BOT_ROOT_DIR: base,
-    // Override resolved paths inside the bot — all bot files use this env var
   };
 }
 
@@ -124,7 +135,7 @@ export function spawnBot(userId: string, settings: UserSettings): void {
     return;
   }
 
-  if (!settings.anthropic_api_key) {
+  if (!settings.anthropic_api_key && !process.env.ANTHROPIC_API_KEY) {
     console.log(`[BotManager] Bot ${userId} sin API key de Anthropic configurada — no se inicia`);
     return;
   }
@@ -262,7 +273,7 @@ export function startAll(
   let started = 0;
   for (const user of users) {
     const settings = getSettings(user.id);
-    if (settings?.anthropic_api_key) {
+    if (settings && (settings.anthropic_api_key || process.env.ANTHROPIC_API_KEY)) {
       spawnBot(user.id, settings);
       started++;
     }

@@ -132,7 +132,7 @@ Responde SOLO este JSON (sin markdown, sin texto extra):
 
     try {
       const msg = await client.messages.create({
-        model: 'claude-opus-4-5',
+        model: (process.env.CLAUDE_MODEL ?? 'claude-sonnet-4-6') as string,
         max_tokens: 500,
         temperature: 0,
         system:
@@ -191,7 +191,7 @@ Responde SOLO este JSON (sin markdown, sin texto extra):
 
     try {
       const msg = await client.messages.create({
-        model: 'claude-opus-4-5',
+        model: (process.env.CLAUDE_MODEL ?? 'claude-sonnet-4-6') as string,
         max_tokens: 300,
         temperature: 0,
         system:

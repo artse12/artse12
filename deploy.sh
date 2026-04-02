@@ -49,10 +49,10 @@ ufw --force enable
 echo -e "${YELLOW}[6/8] Configurando proyecto...${NC}"
 INSTALL_DIR="/opt/btc-saas"
 if [ ! -d "$INSTALL_DIR" ]; then
-    git clone https://github.com/artse12/artse12 "$INSTALL_DIR"
+    git clone https://github.com/artse12/artse12 "$INSTALL_DIR" --branch main
 else
     echo "  Directorio ya existe. Actualizando..."
-    cd "$INSTALL_DIR" && git pull
+    cd "$INSTALL_DIR" && git pull origin main
 fi
 cd "$INSTALL_DIR"
 
@@ -64,11 +64,28 @@ echo -e "${YELLOW}[7/8] Generando variables de entorno...${NC}"
 if [ ! -f ".env" ]; then
     ENCRYPTION_KEY=$(openssl rand -hex 32)
     SESSION_SECRET=$(openssl rand -hex 32)
+
+    echo ""
+    read -p "  Tu email de admin (recibirá permisos de propietario): " ADMIN_EMAIL
+    read -p "  API key Anthropic compartida del servidor (opcional, Enter para omitir): " SERVER_ANTHROPIC_KEY
+    read -p "  Google Client ID (OAuth, opcional, Enter para omitir): " GOOGLE_CLIENT_ID
+    read -p "  Google Client Secret (OAuth, opcional, Enter para omitir): " GOOGLE_CLIENT_SECRET
+    echo ""
+
     cat > .env << EOF
 # Generado automáticamente por deploy.sh — $(date)
 ENCRYPTION_KEY=${ENCRYPTION_KEY}
 SESSION_SECRET=${SESSION_SECRET}
 NODE_ENV=production
+
+# SaaS
+ADMIN_EMAIL=${ADMIN_EMAIL}
+ANTHROPIC_API_KEY=${SERVER_ANTHROPIC_KEY}
+CLAUDE_MODEL=claude-sonnet-4-6
+
+# Google OAuth (dejar vacío si no se usa)
+GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 EOF
     echo -e "${GREEN}  .env generado con claves seguras.${NC}"
     echo -e "${RED}  ⚠ GUARDA ENCRYPTION_KEY: ${ENCRYPTION_KEY}${NC}"

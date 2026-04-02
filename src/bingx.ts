@@ -269,7 +269,7 @@ export class BingXClient {
       positionSide: side,
       type: 'MARKET',
       quantity: 0,
-      reduceOnly: true,
+      reduceOnly: 'true',
     });
   }
 

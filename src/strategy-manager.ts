@@ -188,7 +188,7 @@ Responde SOLO este JSON (sin markdown):
 
     try {
       const msg = await this.client.messages.create({
-        model: 'claude-opus-4-5',
+        model: (process.env.CLAUDE_MODEL ?? 'claude-sonnet-4-6') as string,
         max_tokens: 800,
         temperature: 0,
         system:

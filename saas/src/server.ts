@@ -2,9 +2,13 @@ import 'dotenv/config';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import session from 'express-session';
 import ConnectSQLite from 'connect-sqlite3';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { randomUUID } from 'crypto';
+import bcrypt from 'bcrypt';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getAllActiveUsers, getUserSettings } from './db.js';
+import { getAllActiveUsers, getUserSettings, getUserByEmail, createUser } from './db.js';
 import { startAll } from './bot-manager.js';
 import { authRouter } from './routes/auth.js';
 import { dashboardRouter } from './routes/dashboard.js';
@@ -38,6 +42,32 @@ app.use(session({
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
   },
 }));
+
+// ── Google OAuth strategy (only if credentials configured) ────
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: '/auth/google/callback',
+  }, async (_at, _rt, profile, done) => {
+    try {
+      const email = profile.emails?.[0]?.value;
+      if (!email) return done(new Error('Google no devolvió email'));
+      let user = getUserByEmail(email);
+      if (!user) {
+        const id = randomUUID();
+        const hash = await bcrypt.hash(randomUUID(), 12); // random unusable password
+        createUser(id, email, hash);
+        user = getUserByEmail(email)!;
+      }
+      return done(null, user);
+    } catch (err) {
+      return done(err as Error);
+    }
+  }));
+}
+
+app.use(passport.initialize());
 
 // ── Auth middleware ───────────────────────────────────────────
 function requireAuth(req: Request, res: Response, next: NextFunction): void {
