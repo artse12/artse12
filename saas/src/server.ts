@@ -83,7 +83,7 @@ app.use(requireAuth);
 
 app.get('/health', (_req, res) => res.json({ ok: true, uptime: process.uptime() }));
 app.use('/', dashboardRouter);
-app.use('/settings', settingsRouter);
+app.use(settingsRouter);
 app.use('/api', apiRouter);
 
 // ── 404 ───────────────────────────────────────────────────────
